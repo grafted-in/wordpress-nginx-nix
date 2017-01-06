@@ -1,0 +1,8 @@
+{
+  project        = "...";  # project identifiers look like "random-word-123456"
+  serviceAccount = "...";  # looks like ...@{project}.iam.gserviceaccount.com
+
+  # path to .pem file as a string; if a relative path, you must run deployments from a working
+  # directory that will resolve this path correctly.
+  accessKey      = "...";
+}

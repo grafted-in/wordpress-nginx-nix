@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+# Use this as a wrapper around nixops. It assumes you are keeping your deployment state in the
+# repository in the same directory as this script. The deployment state files must be named
+# "{deployment}.nixops-exported" and be the result of running "nixops export -d {deployment}."
+# This means that each exported file's name must match the name of the deployment and it can only
+# contain one deployment.
+#
+# This wrapper will automatically import these files and keep them in-sync with any nixops actions
+# you do *with this script*.
+#
+# A temporary state file is kept behind the scenes. Run "./manage clear" to clear it.
+
+set -e
+
+repo_root=$(git rev-parse --show-toplevel)
+
+here=$(dirname "$0")
+cd "$here"
+
+state_file=".deployments.nixops"
+
+if [ "$1" == "clear" ]; then
+  echo Clearing "$here/$state_file"
+  rm "$state_file"
+  exit 0
+fi
+
+source nixpkgs-version.sh
+
+export NIX_PATH=nixpkgs="$nixpkgs_snapshot":"$repo_root":.
+export NIXOPS_STATE="$state_file"
+
+export withNixops="nix-shell -p $nixops_version --run"
+
+nixops_export_files=$(find . -maxdepth 1 -name '*.nixops-exported' -print)
+
+if ! [ -f "$state_file" ] && [ -n "$nixops_export_files" ]; then
+  echo "State file needs to be initialized. Run \"$0 clear\" to clear it after a merge or checkout."
+
+  for file in $nixops_export_files; do
+    echo "Importing $file"
+    $withNixops "nixops import" < "$file"
+  done
+fi
+
+update_export_file() {
+  file="$1"
+  depl=$(basename "${file%.*}")
+
+  tmp_file="$file.tmp"
+  if $withNixops "nixops export -d $depl > $tmp_file"; then
+    mv "$tmp_file" "$file"
+    echo "Updated $depl at $file"
+  else
+    >&2 echo "Failed to update $depl at $file"
+    rm -f "$tmp_file"
+  fi
+}
+
+update_exports() {
+  if [ -n "$nixops_export_files" ]; then
+    for file in $nixops_export_files; do
+      update_export_file "$file"
+    done
+  fi
+}
+
+# IMPORTANT: exported state must always match the state file, so run this regardless of exit path
+trap update_exports EXIT
+
+# Arg list trick:
+# https://stackoverflow.com/questions/3104209
+ARGS=$(printf "%q"" " "$@")
+
+$withNixops "nixops $ARGS"
