@@ -9,7 +9,13 @@
 # This wrapper will automatically import these files and keep them in-sync with any nixops actions
 # you do *with this script*.
 #
-# A temporary state file is kept behind the scenes. Run "./manage clear" to clear it.
+# A temporary state file is kept behind the scenes.
+#
+# This script supports some "meta-commands" (i.e. commands that don't get proxied to nixops):
+#   * "./manage .clear" will clear the temporary state file. This is useful after pulling updates
+#                       and your current state file isn't in sync.
+#   * "/.manage .shell" will drop you into a nix-shell but with the exact same environment as your
+#                       deployment system. It's safe to use `nixops` in this shell.
 
 set -e
 
@@ -20,7 +26,7 @@ cd "$here"
 
 state_file=".deployments.nixops"
 
-if [ "$1" == "clear" ]; then
+if [ "$1" == ".clear" ]; then
   echo Clearing "$here/$state_file"
   rm "$state_file"
   exit 0
@@ -69,8 +75,12 @@ update_exports() {
 # IMPORTANT: exported state must always match the state file, so run this regardless of exit path
 trap update_exports EXIT
 
-# Arg list trick:
-# https://stackoverflow.com/questions/3104209
-ARGS=$(printf "%q"" " "$@")
+if [ "$1" == ".shell" ]; then
+  nix-shell -p "$nixops_version"
+else
+  # Arg list trick:
+  # https://stackoverflow.com/questions/3104209
+  ARGS=$(printf "%q"" " "$@")
 
-$withNixops "nixops $ARGS"
+  $withNixops "nixops $ARGS"
+fi
