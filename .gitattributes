@@ -1,4 +1,4 @@
 *.secret   filter=git-crypt diff=git-crypt
 *.keys.nix filter=git-crypt diff=git-crypt
 *.pem      filter=git-crypt diff=git-crypt
-*.nixops*  filter=git-crypt diff=git-crypt
+*.nixops   binary filter=git-crypt diff=git-crypt

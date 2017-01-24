@@ -36,19 +36,18 @@ Configuring deployment:
 To deploy to production, you will use similar steps as deploying to VirtualBox (see the README):
 
   1. Configure `server/physical.gce.prod.nix` to your preferences.
-  2. `deploy/manage create -d prod '<server/logical.nix>' '<server/physical.gce.prod.nix>'`
-  3. `deploy/manage export -d prod > deploy/prod.nixops-exported`
-  4. `deploy/manage deploy -d prod`
+  2. `deploy/manage prod create '<server/logical.nix>' '<server/physical.gce.prod.nix>'`
+  3. `(cd deploy && ./manage prod deploy)`
 
 It may take a long time to build the server and upload all the dependencies.
 
-**IMPORTANT:** You **must** keep your deployment state in `deploy/prod.nixops-exported` and up-to-date in the repository. Once you run the `deploy/manage export` command above, you must commit that file and always commit it any time you do a deployment that causes it to change. The `deploy/manage` script is designed to keep these state files up-to-date on every deployment so that you can be sure to have the right file in your repository. Do not allow simultaneous deployments and always use the deployment state file that actually corresponds to the state of the server.
+**IMPORTANT:** You **must** keep the deployment state in `deploy/prod.nixops` up-to-date in the repository. Once you run the `deploy/manage prod deploy` command above, you must commit that file and always commit it any time you do a deployment that causes it to change. The `deploy/manage` script is designed to keep these state files up-to-date on every deployment so that you can be sure to have the right file in your repository. Do not allow simultaneous deployments and always use the deployment state file that actually corresponds to the state of the server.
 
 
 ### Using an existing deployment
 
-Once you've made a deployment and committed its `.nixops-exported` file to the repository, anyone on your team can deploy who has `git-crypt` access to the file. The steps are just like before:
+Once you've made a deployment and committed its `.nixops` file to the repository, anyone on your team can deploy who has `git-crypt` access to the file. The steps are just like before:
 
-  1. `deploy/manage info -d prod` (get info about the production deployment)
-  2. `deploy/manage deploy -d prod` (deploy to production)
-  3. `git add deploy/prod.nixops-exported && git commit -m"Deployment"`
+  1. `deploy/manage prod info` (get info about the production deployment)
+  2. `(cd deploy && ./manage prod deploy)` (deploy to production)
+  3. `git add deploy/prod.nixops && git commit -m"Deployment"`

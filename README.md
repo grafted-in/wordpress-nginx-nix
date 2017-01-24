@@ -33,22 +33,21 @@ With this setup, you can easily deploy your site to one or more servers with min
 
 Create a VirtualBox deployment:
 
-  1. `deploy/manage create -d vbox '<server/logical.vbox.nix>' '<server/physical.vbox.nix>'`
-  2. `deploy/manage deploy -d vbox`
+  1. `deploy/manage vbox create '<server/logical.vbox.nix>' '<server/physical.vbox.nix>'`
+  2. `deploy/manage vbox deploy`
 
 **Notes:**
 
   * `nixops` deployments can sometimes be finicky. If something hangs or fails, try running it again. It is a very deterministic system so this should not be a problem.
   * Run `deploy/manage --help` to see all options (this is just `nixops` underneath).
-  * If you would like to save this deployment in the repository, run `deploy/manage export -d vbox > deploy/vbox.nixops-exported`. This will cause the `manage` script to keep the file up-to-date so you can commit it.
 
-You should then be able to open the IP of the VM in your browser and test it. If you don't know the IP, run `deploy/manage info -d vbox`.
+You should then be able to open the IP of the VM in your browser and test it. If you don't know the IP, run `deploy/manage vbox info`.
 
 
 ### Troubleshooting
 
-  * Sometimes VirtualBox will give your machine a new IP. If this happens, `nixops` (i.e. the `manage` script) may fail to connect to your machine via SSH. If this happens, remove the line with the old IP from your `~/.ssh/known_hosts` file and try again.
-  * If the state of your VirtualBox VM changes in a way that `nixops` didn't notice, your deployments may fail. Try running `./manage deploy -d vbox --check` (using the `--check` flag) to tell `nixops` to reassess the state of the machine.
+  * If the state of your VirtualBox VM changes in a way that `nixops` didn't notice, your deployments may fail. Try running `deploy/manage deploy -d vbox --check` (using the `--check` flag) to tell `nixops` to reassess the state of the machine.
+  * Sometimes VirtualBox will give your machine a new IP. If this happens, `nixops` (i.e. the `manage` script) may fail to connect to your machine via SSH. If this happens, remove the line with the old IP from your `~/.ssh/known_hosts` file and try again with the `--check` flag.
 
 
 ## Deploying to Real Servers
