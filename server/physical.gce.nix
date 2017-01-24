@@ -1,5 +1,7 @@
+with import ./common.nix;
+
 { credentials, machineRegion, staticIpRegion }: {
-  wordpress-main = {resources, ...}: {
+  ${machineName} = {resources, ...}: {
     deployment.targetEnv = "gce";
     deployment.gce = credentials // {
       region       = machineRegion;

@@ -1,4 +1,4 @@
-with import ./common.nix;
+with import ./utils.nix;
 let
   writeableDefault = {
     appPaths = [];           # list of paths in the app to make writeable
@@ -44,16 +44,13 @@ let
   installPath = isFrozen: from: to:
     (if isFrozen then "ln -s" else "cp -r") + " " + ''"${from}" "${to}"'';
 
-  assignPermissions = dir: ''
-    chown -R "${writeable_.owner}" "${dir}"
-    chmod -R 744 "${dir}"
-  '';
-
-  # The setup script for the app.
+  # The build script for the app.
   # This will install WordPress, the wp-config, plugins, and themes.
   # If any writeble paths were configured, this script will copy them to a another folder in the
   # package and set up symlinks in their place the given writeable path on the system.
-  mkSetupScript = out: ''
+  buildPackageAt = out: ''
+    mkdir -p $(dirname "${out}")  # Make parent directory.
+
     cp -r "${wordpress}" "${out}"
     chmod -R +w "${out}"
 
@@ -87,39 +84,45 @@ let
     ''}
   '';
 
-  mkInitScript = package: writeScript "init-writeable-paths" ''
+  # Copy the original writeable contents of the package to a writeable dir.
+  initWriteablePathsFor = package: ''
+    mkdir -p "$out"
+    writeable_orig_dir="${package}/${writeable_.pkgPath}"
+    for thing in $( ls "$writeable_orig_dir" ); do
+      cp -r "$writeable_orig_dir/$thing" "$out"
+    done
+  '';
+
+  # Takes an existing script and makes a initialization script that only runs if the output path
+  # has not been built yet.
+  mkInitScript = script: writeScript "init-writeable-paths" ''
     #!/bin/sh
 
     out="${writeable_.sysPath}"
 
     if [ ! -d "$out" ]; then
 
-      mkdir -p "$out"
-      writeable_orig_dir="${package}/${writeable_.pkgPath}"
-      for thing in $( ls "$writeable_orig_dir" ); do
-        cp -r "$writeable_orig_dir/$thing" "$out"
-      done
+      ${script}
 
-      ${assignPermissions "$out"}
+      chown -R "${writeable_.owner}" "$out"
+      chmod -R 744 "$out"
 
+    else
+      echo Output directory already exists. Not building path: "$out"
     fi
   '';
-
 
 in if appConfig.freezeWordPress
   then rec {
     # For a mostly frozen app, we install it as a package and set up writeable paths on first run.
-    initScript = mkInitScript package;
-    package    = runCommand "wordpress-site" {} (mkSetupScript "$out");
+    initScript = mkInitScript (initWriteablePathsFor package);
+    package    = runCommand "wordpress-app" {
+      preferLocalBuild = true;
+    } (buildPackageAt "$out");
   }
   else rec {
     # For fully writeable app, we skip package installation and write the app directly to the
     # writeable path on first run.
-    initScript = writeScript "install-wordpress-app" ''
-      #!/bin/sh
-      mkdir -p $(dirname "${package}")
-      ${mkSetupScript package}
-      ${assignPermissions package}
-    '';
-    package = writeable_.sysPath;
+    initScript = mkInitScript (buildPackageAt package);
+    package    = writeable_.sysPath;
   }

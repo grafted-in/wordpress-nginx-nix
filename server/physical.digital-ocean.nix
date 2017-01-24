@@ -1,7 +1,9 @@
+with import ./common.nix;
+
 { apiAuthToken, dropletRegion, dropletSize }: {
   resources.sshKeyPairs.ssh-key = {};
 
-  wordpress-main = {...}: {
+  ${machineName} = {...}: {
     deployment = {
       targetEnv = "digitalOcean";
       digitalOcean = {

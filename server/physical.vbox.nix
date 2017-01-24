@@ -1,10 +1,13 @@
+with import ./common.nix {};
+
 let
-  machineTemplate = memoryGb: {
+  machineTemplate = memoryMb: {
     deployment.targetEnv = "virtualbox";
     deployment.virtualbox = {
-      memorySize = 1024 * memoryGb;
+      headless   = true;
+      memorySize = memoryMb;
     };
   };
 in {
-  wordpress-main = machineTemplate 1;
+  ${machineName} = machineTemplate 1024;
 }

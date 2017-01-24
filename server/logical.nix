@@ -1,5 +1,7 @@
 # Logical definition of our server
 
+with import ./common.nix;
+
 appConfigOverrides: let
   appConfigDefault = import ../default-app-config.nix;
   appConfig = appConfigDefault // appConfigOverrides;
@@ -8,7 +10,7 @@ in {
     inherit (appConfig) enableRollback description;
   };
 
-  wordpress-main = { config, pkgs, ... }: let
+  ${machineName} = { config, pkgs, ... }: let
     # This is not being used but can be useful for testing/development:
     phpTestIndex = pkgs.writeTextDir "index.php" "<?php var_export($_SERVER)?>";
 
@@ -37,7 +39,7 @@ in {
     };
   in {
     networking = {
-      hostName = "wordpress-main";
+      hostName = machineName;
       firewall.allowedTCPPorts = [80] ++ pkgs.lib.optional appConfig.enableHttps 443;
     };
 
@@ -85,10 +87,10 @@ in {
           listen.mode = 660
 
           pm = dynamic
-          pm.max_children = 75
-          pm.start_servers = 10
-          pm.min_spare_servers = 5
-          pm.max_spare_servers = 20
+          pm.max_children = 8
+          pm.start_servers = 4
+          pm.min_spare_servers = 4
+          pm.max_spare_servers = 4
           pm.max_requests = 500
         '';
       };
