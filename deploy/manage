@@ -3,6 +3,8 @@
 # A NixOps Wrapper for Git Projects
 # ---------------------------------
 #
+# Repo: https://github.com/grafted-in/nixops-manager
+#
 # This tool is a simple wrapper around NixOps. The goal is to make it easier to use NixOps when you
 # want to share your deployment state between members of a team.
 #
@@ -47,8 +49,8 @@ command -v nix-shell >/dev/null 2>&1 || {
   fi
 }
 
-repo_root=$(git rev-parse --show-toplevel)
 here=$(dirname "$0")
+repo_root=$(git rev-parse --show-toplevel)  # Use Git to find repo root.
 
 deployment="$1"
 command="$2"
@@ -59,6 +61,7 @@ source "$here/nixpkgs-version.sh"
 export NIX_PATH=nixpkgs="$nixpkgs_snapshot":"$repo_root":.
 export NIXOPS_STATE="$state_file"
 export NIXOPS_DEPLOYMENT="$deployment"
+export SSH_AUTH_SOCK=''  # Don't use SSH keyring since we get everything from the state file.
 
 withNixops="nix-shell -p $nixops_version --run"
 
@@ -72,7 +75,7 @@ if [[ $deployment == --* ]]; then
   exit $?
 elif [ "$command" == ".shell" ]; then
   nix-shell -p "$nixops_version"
-elif [ ! -e "$state_file" ]; then
+elif [ ! -e "$state_file" ] && [ "$command" != "create" ]; then
   >&2 echo "You're trying to use a deployment that doesn't exist yet. Try running $0 $deployment create"
   exit 1
 else
