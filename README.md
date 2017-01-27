@@ -46,6 +46,7 @@ You should then be able to open the IP of the VM in your browser and test it. If
 
 ### Troubleshooting
 
+  * If you're on macOS (Darwin), `nixops` needs to build Linux packages. Usually it's able to get them from a cache or build them on the remote server. However, if you get an error about not being able to build a package because you're on "darwin", then **deploy to VirtualBox first and try again.** This will often offload the Linux builds to the VM and then your real deployment will work. If even *this* doesn't work you can use [this](https://github.com/3noch/nix-vbox-build-slave) to create a VirtualBox build slave.
   * If the state of your VirtualBox VM changes in a way that `nixops` didn't notice, your deployments may fail. Try running `deploy/manage deploy -d vbox --check` (using the `--check` flag) to tell `nixops` to reassess the state of the machine.
   * Sometimes VirtualBox will give your machine a new IP. If this happens, `nixops` (i.e. the `manage` script) may fail to connect to your machine via SSH. If this happens, remove the line with the old IP from your `~/.ssh/known_hosts` file and try again with the `--check` flag.
 
