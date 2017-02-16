@@ -37,6 +37,10 @@ let
       location /.well-known/acme-challenge {
         root "${acmeChallengesDir}";
       }
+
+      location / {
+        return 301 https://${host}$request_uri;
+      }
     }
 
     ${hostRedirectsConfig "https"}

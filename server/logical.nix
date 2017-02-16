@@ -73,28 +73,15 @@ in {
         ; WARNING: Be sure to load opcache *before* xdebug (http://us3.php.net/manual/en/opcache.installation.php).
         zend_extension = "${pkgs.phpPackages.xdebug}/lib/php/extensions/xdebug.so"
 
+        sendmail_path = /var/setuid-wrappers/sendmail -t -i
+
         ${import ./opcache-config.nix { enabled = appConfig.enableOpCache; }}
       '';
 
-      pools.wordpress-pool = {
-        listen = phpFpmListen;
-        extraConfig = ''
-          user  = ${config.services.nginx.user}
-          group = ${config.services.nginx.group}
-
-          listen.owner = ${config.services.nginx.user}
-          listen.group = ${config.services.nginx.group}
-          listen.mode = 660
-
-          pm = dynamic
-          pm.max_children = 8
-          pm.start_servers = 4
-          pm.min_spare_servers = 4
-          pm.max_spare_servers = 4
-          pm.max_requests = 500
-        '';
-      };
+      pools.wordpress-pool = import ./php-fpm-conf.nix { inherit config phpFpmListen; };
     };
+
+    services.postfix.enable = true;
 
     systemd.services.init-writeable-paths = {
       description   = "Initialize writeable directories for the app";

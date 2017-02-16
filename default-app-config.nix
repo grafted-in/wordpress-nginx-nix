@@ -38,7 +38,7 @@ in rec {
     secrets     = builtins.readFile ./wordpress-keys.php.secret;
     debugMode   = false;
     extraConfig = let
-        siteUrl = if enableHttps then "https" else "http" + "://${host}";
+        siteUrl = (if enableHttps then "https" else "http") + "://${host}";
       in ''
         define('WP_HOME',    '${siteUrl}');
         define('WP_SITEURL', '${siteUrl}');
