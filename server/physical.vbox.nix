@@ -1,4 +1,4 @@
-with import ./common.nix {};
+with import ./common.nix;
 
 let
   machineTemplate = memoryMb: {

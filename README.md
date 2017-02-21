@@ -25,7 +25,8 @@ With this setup, you can easily deploy your site to one or more servers with min
 
 ## Setting Up WordPress
 
-  1. Create unique WordPress keys for your site: `curl https://api.wordpress.org/secret-key/1.1/salt/ > deploy/wordpress-keys.php.secret`.
+  1. Create unique WordPress keys for your site (must be in the same directory as `default-app-config.nix`):
+    * `curl https://api.wordpress.org/secret-key/1.1/salt/ > wordpress-keys.php.secret`.
   2. Configure your site by editing `default-app-config.nix`.
 
 

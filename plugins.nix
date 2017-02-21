@@ -1,7 +1,7 @@
 # A list of your WordPress plugins.
 { callPackage, ... }:
 let
-  utils = callPackage ../utils.nix {};
+  utils = callPackage ./utils.nix {};
   getPlugin = utils.getPlugin;
 
   requiredPlugins = [
