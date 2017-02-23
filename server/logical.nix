@@ -2,7 +2,8 @@
 
 with import ./common.nix;
 
-overrideFn: # a function of the form (super: self: { ... }) to override defaults
+overrideFn: # a function of the form (self: super: { ... })
+            # to override defaults in default-app-config.nix
 let
   appConfig = (import ../default-app-config.nix).extend overrideFn;
 in {
