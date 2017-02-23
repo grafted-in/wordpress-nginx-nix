@@ -7,7 +7,7 @@ overrideFn: # a function of the form (self: super: { ... })
 let
   appConfig = (import ../default-app-config.nix).extend overrideFn;
 in {
-  network = builtins.trace appConfig.host {
+  network = {
     inherit (appConfig) enableRollback description;
   };
 
