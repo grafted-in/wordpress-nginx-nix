@@ -2,11 +2,11 @@
 
 with import ./common.nix;
 
-appConfigOverrides: let
-  appConfigDefault = import ../default-app-config.nix;
-  appConfig = appConfigDefault // appConfigOverrides;
+overrideFn: # a function of the form (super: self: { ... }) to override defaults
+let
+  appConfig = (import ../default-app-config.nix).extend overrideFn;
 in {
-  network = {
+  network = builtins.trace appConfig.host {
     inherit (appConfig) enableRollback description;
   };
 

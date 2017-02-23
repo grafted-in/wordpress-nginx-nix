@@ -34,7 +34,7 @@ let
   themes    = callPackage appConfig.themes {};
 
   # The wp-config.php file.
-  wpConfigFile = writeText "wp-config.php" appConfig.wpConfig;
+  wpConfigFile = writeText "wp-config.php" appConfig.wpConfig.rendered;
 
   # Generates a list of paths in bash that can be looped over.
   listOfPaths = lib.concatMapStringsSep " " (x: "'${x}'");

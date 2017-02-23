@@ -2,6 +2,7 @@
 , secrets
 , debugMode ? false
 , extraConfig
+, ...
 }:
 ''
   <?php

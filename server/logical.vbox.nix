@@ -1,7 +1,7 @@
-import ./logical.nix {
-  host           = "testsite.dev";
+import ./logical.nix (self: super: {
+  domain         = "testsite.dev";
+  host           = self.domain;
   hostRedirects  = [];
-  adminEmail     = "admin@graftedindesign.com";
   enableHttps    = false;
   enableRollback = false;
-}
+})

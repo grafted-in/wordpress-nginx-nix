@@ -1,1 +1,1 @@
-import ./logical.nix {}
+import ./logical.nix (self: super: {})
