@@ -37,7 +37,7 @@ With this setup, you can easily deploy your site to one or more servers with min
 This project requires that you build Linux binaries which can be deployed to a server (VirtualBox or otherwise). Since macOS cannot natively build Linux binaries, you will need a NixOS build slave running.
 
   1. Install [Docker](https://www.docker.com/) and then use [this script](https://github.com/LnL7/nix-docker/blob/master/start-docker-nix-build-slave) to set up a NixOS build slave. For example:
-    * `source <(curl -fsSL https://raw.githubusercontent.com/LnL7/nix-docker/master/start-docker-nix-build-slave -o ~/start-docker-nix-build-slave)`
+    * `source <(curl -fsSL https://raw.githubusercontent.com/LnL7/nix-docker/master/start-docker-nix-build-slave)`
     * `deploy/manage vbox deploy` (or some other deployment command)
   2. If you can't/don't want to install Docker, you can use NixOps to create a NixOS build slave via VirtualBox using [this](https://github.com/3noch/nix-vbox-build-slave). Note that using Docker is almost certainly going to be easier so I recommend that way instead.
 
