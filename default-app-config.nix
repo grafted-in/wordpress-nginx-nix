@@ -20,6 +20,9 @@ in lib.makeExtensible (self: {
   plugins   = import ./plugins.nix;
   themes    = import ./themes.nix;
 
+  # Warning: Changing these after your site has been deployed will require manual
+  #          work on the server. We don't want to do anything that would lose
+  #          data so we leave that to you.
   freezeWordPress = true;  # Can admins upgrade WordPress in the CMS?
   freezePlugins   = true;  # Can admins edit plugins in the CMS?
   freezeThemes    = true;  # Can admins edit themes in the CMS?
