@@ -87,6 +87,7 @@ With this setup you can deploy to any PaaS/IaaS service supported by `nixops`. R
 
 We plan to add more (such as AWS) in the future. If you want to do it yourself and understand Nix, the work to add this configuration is minimal. Pull requests welcome!
 
+**NOTE:** When SSL/TLS is enabled for production servers, the first deployment may take a *long time* (i.e. more than 20 minutes) to finish. A large chunk of first-deployment time will be spent generating new [DH parameters](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) for Nginx. This is normal!
 
 ## Keeping Secrets
 

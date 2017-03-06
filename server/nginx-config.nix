@@ -10,6 +10,7 @@
 , hostRedirects ? []  # list of hosts that redirect to the primary host
 , appRoot             # root directory to serve
 , enableHttps         # serve the site over HTTPS only?
+, dhParams ? null     # path to the dhparams pem file to use for TLS
 , fastCgiCachePath    # path to fast CGI cache directory or `null` to disable the cache
 , pageSpeedCachePath  # path to PageSpeed cache directory or `null` disable PageSpeed
 
@@ -98,7 +99,9 @@ let
     ssl_stapling on;
     ssl_stapling_verify on;
 
-    #ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    ${pkgs.lib.optionalString (!(isNull dhParams)) ''
+      ssl_dhparam "${dhParams}";
+    ''}
   '';
 
   serverPart = ''

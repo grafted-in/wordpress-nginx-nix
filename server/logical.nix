@@ -35,6 +35,7 @@ in {
       inherit config pkgs acmeChallengesDir phpFpmListen;
       inherit (appConfig) enableHttps host hostRedirects;
       appRoot = "${app.package}";
+      dhParams =           if appConfig.enableHttps        then "${config.security.dhparams.path}/nginx.pem" else null;
       pageSpeedCachePath = if enablePageSpeed              then "/run/nginx-pagespeed-cache" else null;
       fastCgiCachePath   = if appConfig.enableFastCgiCache then "/run/nginx-fastcgi-cache"   else null;
     };
@@ -93,13 +94,16 @@ in {
         ExecStart = app.initScript;
       };
     };
-  } // (
-    if appConfig.enableHttps then {
-      security.acme.certs.${appConfig.host} = {
-        webroot = acmeChallengesDir;
-        email   = appConfig.adminEmail;
-        postRun = "systemctl reload nginx.service";
-      };
-    } else {}
-  );
+  }
+  //
+  (if !appConfig.enableHttps then {} else {
+    security.acme.certs.${appConfig.host} = {
+      webroot = acmeChallengesDir;
+      email   = appConfig.adminEmail;
+      postRun = "systemctl reload nginx.service";
+    };
+
+    # Depending on hardware, first-time deploy could take a good 5-15 minutes for this to generate.
+    security.dhparams.params = { nginx = 3072; };
+  });
 }
