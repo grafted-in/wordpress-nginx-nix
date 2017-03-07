@@ -1,7 +1,7 @@
 { fetchzip, runCommand, ... }:
 let
-  version = "4.7.2";
+  version = "4.7.3";
 in fetchzip {
-  url = "https://wordpress.org/wordpress-${version}.tar.gz";
-  sha256 = "0im54f83q9adskjq9m1jnwsb8vrb2pwav5m4nj4vsbrapvbzh9m6";
+  url    = "https://wordpress.org/wordpress-${version}.tar.gz";
+  sha256 = "08val9zlid2swi0c46xh9hyjmd8visdsq4q2fdrjvvm38qazhsgl";
 }
