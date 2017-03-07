@@ -75,7 +75,7 @@ in {
         ; WARNING: Be sure to load opcache *before* xdebug (http://us3.php.net/manual/en/opcache.installation.php).
         zend_extension = "${pkgs.phpPackages.xdebug}/lib/php/extensions/xdebug.so"
 
-        sendmail_path = ${pkgs.postfix}/bin/sendmail -t -i
+        sendmail_path = /run/wrappers/bin/sendmail -t -i
 
         ${import ./opcache-config.nix { enabled = appConfig.enableOpCache; }}
       '';
