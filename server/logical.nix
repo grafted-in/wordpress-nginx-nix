@@ -49,6 +49,8 @@ in {
       gzip unzip nix-repl php vim zip
     ];
 
+    time.timeZone = "${appConfig.timezone}";
+
     services.nginx = {
       enable     = true;
       package    = pkgs.callPackage ./nginx.nix { inherit enablePageSpeed; };
@@ -75,6 +77,7 @@ in {
         ; WARNING: Be sure to load opcache *before* xdebug (http://us3.php.net/manual/en/opcache.installation.php).
         zend_extension = "${pkgs.phpPackages.xdebug}/lib/php/extensions/xdebug.so"
 
+        date.timezone = "${appConfig.timezone}"
         sendmail_path = /run/wrappers/bin/sendmail -t -i
 
         ${import ./opcache-config.nix { enabled = appConfig.enableOpCache; }}

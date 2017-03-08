@@ -16,6 +16,9 @@ in lib.makeExtensible (self: {
   # Hosts that get redirected to the primary host.
   hostRedirects = [self.domain];
 
+  # Configure timezone settings (http://php.net/manual/en/timezones.php)
+  timezone  = "UTC";
+
   wordpress = import ./wordpress.nix;
   plugins   = import ./plugins.nix;
   themes    = import ./themes.nix;
