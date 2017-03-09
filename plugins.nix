@@ -10,5 +10,5 @@ let
   ];
 in requiredPlugins ++ [
   (getPlugin "akismet" "3.3"   "02vsjnr7bs54a744p64rx7jwlbcall6nhh1mv6w54zbwj4ygqz68")
-  (getPlugin "jetpack" "4.6" "08dk1b5x2pr5gf2sqza41n0z8liiicalki0fxzkxsblgm81d5qbd")
+  (getPlugin "jetpack" "4.7" "1w9grlrjrzrb0ad2i2rsiw24qa8vi5kz9svrd0v33hn471n8r6lq")
 ]
