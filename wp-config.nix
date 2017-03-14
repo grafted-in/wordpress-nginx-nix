@@ -19,7 +19,7 @@
   ${extraConfig}
 
   define('WP_DEBUG', ${if debugMode then "true" else "false"});
-
-  define('ABSPATH', dirname(__FILE__) . '/');
+  if ( !defined('ABSPATH') )
+    define('ABSPATH', dirname(__FILE__) . '/');
   require_once(ABSPATH . 'wp-settings.php');
 ''

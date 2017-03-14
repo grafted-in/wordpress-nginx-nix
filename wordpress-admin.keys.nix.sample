@@ -1,0 +1,5 @@
+{
+  # Configure credentials for the superadmin in Wordpress
+  adminUser = "...";
+  adminPassword = "...";
+}

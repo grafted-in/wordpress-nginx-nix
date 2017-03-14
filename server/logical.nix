@@ -97,6 +97,41 @@ in {
         ExecStart = app.initScript;
       };
     };
+
+    systemd.services.wp-cli = {
+      enable        = appConfig.autoInstall;
+      description   = "WP-CLI for WordPress";
+      after         = [ "mysql.service" ];
+      wantedBy      = [ "multi-user.target" ];
+      serviceConfig = {
+        Type        = "oneshot";
+        ExecStart   = pkgs.writeScript "bootstrap-wordpress.sh" ''
+          #!${pkgs.stdenv.shell} -eu
+          if ! $("${pkgs.wp-cli}"/bin/wp core is-installed --path="${app.package}" --allow-root); then
+            "${pkgs.wp-cli}"/bin/wp core install \
+            --url="${appConfig.host}" \
+            --title="${appConfig.description}" \
+            --admin_user="${appConfig.adminUser}" \
+            --admin_password="${appConfig.adminPassword}" \
+            --admin_email="${appConfig.adminEmail}" \
+            --path="${app.package}" \
+            --allow-root;
+            chown -R nginx:root /var/lib/phpfpm/${appConfig.name};
+          fi
+          "${pkgs.wp-cli}"/bin/wp option update blogname "${appConfig.description}" \
+          --path="${app.package}" \
+          --allow-root;
+          "${pkgs.wp-cli}"/bin/wp option update blogdescription "${appConfig.tagline}" \
+          --path="${app.package}" \
+          --allow-root;
+        '';
+        };
+        environment.PHP_INI_SCAN_DIR = let
+        customIni = pkgs.writeTextDir "wp-cli-custom.ini" ''
+          sendmail_path = ${pkgs.postfix}/bin/sendmail -t -i
+        '';
+        in "${pkgs.php}/etc:${customIni}";
+      };
   }
   //
   (if !appConfig.enableHttps then {} else {
