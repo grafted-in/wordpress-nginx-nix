@@ -10,6 +10,7 @@ in lib.makeExtensible (self: {
   name        = "wordpress-app";
 
   description = "A Wordpress Site";    # Brief, one-line description or title
+  tagline     = "Deployed with Nixops";
   host        = "www.${self.domain}";
   adminEmail  = "admin@${self.host}";
 
@@ -18,6 +19,11 @@ in lib.makeExtensible (self: {
 
   # Configure timezone settings (http://php.net/manual/en/timezones.php)
   timezone  = "UTC";
+
+  # WP-CLI settings for automatic install
+  autoInstall   = false;
+  adminUser     = (import ./wordpress-admin.keys.nix).adminUser;
+  adminPassword = (import ./wordpress-admin.keys.nix).adminPassword;
 
   wordpress = import ./wordpress.nix;
   plugins   = import ./plugins.nix;
