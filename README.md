@@ -47,8 +47,9 @@ This project requires that you build Linux binaries which can be deployed to a s
   1. Create unique WordPress keys for your site (must be in the same directory as `default-app-config.nix`):
     * `curl https://api.wordpress.org/secret-key/1.1/salt/ > wordpress-keys.php.secret`.
   2. Configure your site by editing `default-app-config.nix`.
-    * For automatic install using WP-CLI, use `autoInstall = true;`.
-      * Copy `./wordpress-admin.keys.nix.sample` to `./wordpress-admin.keys.nix`. Replace `...` with your credentials.
+    * For automatic install using WP-CLI:
+      * Configure the `autoInstall` section to use `enable = true;`.
+      * Copy `./wordpress-admin.keys.nix.sample` to `./wordpress-admin.keys.nix` and replace `...` with your credentials.
     * For a traditional install where WordPress is entirely managed by the admin panel, use `freezeWordPress = false;`.
     * To have Nix manage themes but not plugins, you can use `freezeWordPress = true; freezeThemes = true; freezePlugins = false;`.
     * When WordPress is frozen (i.e. managed by Nix), use `wordpress.nix` to govern the installed version.

@@ -4,4 +4,5 @@ import ./logical.nix (self: super: {
   hostRedirects  = [];
   enableHttps    = false;
   enableRollback = false;
+  enableXDebug   = true;
 })
