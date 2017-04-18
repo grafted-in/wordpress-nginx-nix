@@ -14,6 +14,8 @@ in lib.makeExtensible (self: {
   host        = "www.${self.domain}";
   adminEmail  = "admin@${self.host}";
 
+  siteUrl = "${if self.enableHttps then "https" else "http"}://${self.host}";
+
   # Hosts that get redirected to the primary host.
   hostRedirects = [self.domain];
 
@@ -21,9 +23,12 @@ in lib.makeExtensible (self: {
   timezone  = "UTC";
 
   # WP-CLI settings for automatic install
-  autoInstall   = false;
-  adminUser     = (import ./wordpress-admin.keys.nix).adminUser;
-  adminPassword = (import ./wordpress-admin.keys.nix).adminPassword;
+  autoInstall = let
+      adminConfig = import ./wordpress-admin.keys.nix;
+    in lib.makeExtensible (innerSelf: {
+      enable = false;  # set to `true` to automatically install WordPress configuration
+      inherit (adminConfig) adminUser adminPassword;
+    });
 
   wordpress = import ./wordpress.nix;
   plugins   = import ./plugins.nix;
@@ -50,11 +55,9 @@ in lib.makeExtensible (self: {
     # Generate this file with `curl https://api.wordpress.org/secret-key/1.1/salt/ > wordpress-keys.php.secret`
     secrets     = builtins.readFile ./wordpress-keys.php.secret;
     debugMode   = false;
-    extraConfig = let
-        siteUrl = (if self.enableHttps then "https" else "http") + "://${self.host}";
-      in ''
-        define('WP_HOME',    '${siteUrl}');
-        define('WP_SITEURL', '${siteUrl}');
+    extraConfig = ''
+        define('WP_HOME',    '${self.siteUrl}');
+        define('WP_SITEURL', '${self.siteUrl}');
     '';
 
     inherit (self) dbConfig;
@@ -66,7 +69,13 @@ in lib.makeExtensible (self: {
 
   # Server settings
   enableHttps        = true;
-  enableOpCache      = true;
   enableFastCgiCache = true;
   enableRollback     = true;
+
+  # PHP settings
+  enableOpCache      = true;
+  enableXDebug       = false;
+
+  # sendmail_path configuration for php.ini files
+  phpSendmailPath = "/run/wrappers/bin/sendmail -t -i";
 })

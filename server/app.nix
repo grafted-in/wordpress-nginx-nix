@@ -124,5 +124,5 @@ in if appConfig.freezeWordPress
     # For fully writeable app, we skip package installation and write the app directly to the
     # writeable path on first run.
     initScript = mkInitScript (buildPackageAt package);
-    package    = writeable_.sysPath;
+    package    = builtins.trace writeable_.sysPath writeable_.sysPath;
   }

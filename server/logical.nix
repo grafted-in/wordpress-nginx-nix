@@ -23,10 +23,11 @@ in {
     phpFpmListen      = "/run/phpfpm/wordpress-pool.sock";
     enablePageSpeed   = pkgs.stdenv.isLinux;
 
+    writeableDataPath = "/var/lib/phpfpm/${appConfig.name}";
     app = pkgs.callPackage ./app.nix {
       inherit appConfig;
       writeable = {
-        sysPath = "/var/lib/phpfpm/${appConfig.name}";
+        sysPath = writeableDataPath;
         owner   = config.services.nginx.user;
       };
     };
@@ -39,6 +40,8 @@ in {
       pageSpeedCachePath = if enablePageSpeed              then "/run/nginx-pagespeed-cache" else null;
       fastCgiCachePath   = if appConfig.enableFastCgiCache then "/run/nginx-fastcgi-cache"   else null;
     };
+
+    phpIni = import ./php-config.nix { inherit pkgs config appConfig; };
   in {
     networking = {
       hostName = machineName;
@@ -70,19 +73,7 @@ in {
     };
 
     services.phpfpm = {
-      phpOptions = ''
-        extension      = "${pkgs.phpPackages.imagick}/lib/php/extensions/imagick.so"
-        zend_extension = "${config.services.phpfpm.phpPackage}/lib/php/extensions/opcache.so"
-
-        ; WARNING: Be sure to load opcache *before* xdebug (http://us3.php.net/manual/en/opcache.installation.php).
-        zend_extension = "${pkgs.phpPackages.xdebug}/lib/php/extensions/xdebug.so"
-
-        date.timezone = "${appConfig.timezone}"
-        sendmail_path = /run/wrappers/bin/sendmail -t -i
-
-        ${import ./opcache-config.nix { enabled = appConfig.enableOpCache; }}
-      '';
-
+      phpOptions = phpIni;
       pools.wordpress-pool = import ./php-fpm-conf.nix { inherit config phpFpmListen; };
     };
 
@@ -90,7 +81,7 @@ in {
 
     systemd.services.init-writeable-paths = {
       description   = "Initialize writeable directories for the app";
-      wantedBy      = [ "multi-user.target" "phpfpm" "nginx" ];
+      wantedBy      = [ "multi-user.target" "phpfpm.service" "nginx.service" ];
       after         = [ "network.target" ];
       serviceConfig = {
         Type      = "oneshot";
@@ -98,40 +89,23 @@ in {
       };
     };
 
-    systemd.services.wp-cli = {
-      enable        = appConfig.autoInstall;
-      description   = "WP-CLI for WordPress";
+    systemd.services.install-wp = {
+      enable        = appConfig.autoInstall.enable;
+      description   = "Configure WordPress installation with WP-CLI";
+      before        = [ "nginx.service" ];
       after         = [ "mysql.service" ];
       wantedBy      = [ "multi-user.target" ];
       serviceConfig = {
         Type        = "oneshot";
-        ExecStart   = pkgs.writeScript "bootstrap-wordpress.sh" ''
-          #!${pkgs.stdenv.shell} -eu
-          if ! $("${pkgs.wp-cli}"/bin/wp core is-installed --path="${app.package}" --allow-root); then
-            "${pkgs.wp-cli}"/bin/wp core install \
-            --url="${appConfig.host}" \
-            --title="${appConfig.description}" \
-            --admin_user="${appConfig.adminUser}" \
-            --admin_password="${appConfig.adminPassword}" \
-            --admin_email="${appConfig.adminEmail}" \
-            --path="${app.package}" \
-            --allow-root;
-            chown -R nginx:root /var/lib/phpfpm/${appConfig.name};
-          fi
-          "${pkgs.wp-cli}"/bin/wp option update blogname "${appConfig.description}" \
-          --path="${app.package}" \
-          --allow-root;
-          "${pkgs.wp-cli}"/bin/wp option update blogdescription "${appConfig.tagline}" \
-          --path="${app.package}" \
-          --allow-root;
-        '';
+        ExecStart   = import ./install-wp.nix {
+          inherit pkgs config appConfig writeableDataPath;
+          appPackage = app.package;
         };
-        environment.PHP_INI_SCAN_DIR = let
-        customIni = pkgs.writeTextDir "wp-cli-custom.ini" ''
-          sendmail_path = ${pkgs.postfix}/bin/sendmail -t -i
-        '';
-        in "${pkgs.php}/etc:${customIni}";
       };
+      environment.PHP_INI_SCAN_DIR = let
+          customIni = pkgs.writeTextDir "wp-cli-custom.ini" phpIni;
+        in "${pkgs.php}/etc:${customIni}";
+    };
   }
   //
   (if !appConfig.enableHttps then {} else {
