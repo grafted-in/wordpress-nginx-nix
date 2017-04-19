@@ -45,18 +45,18 @@ This project requires that you build Linux binaries which can be deployed to a s
 ## Setting Up WordPress
 
   1. Create unique WordPress keys for your site (must be in the same directory as `default-app-config.nix`):
-    * `curl https://api.wordpress.org/secret-key/1.1/salt/ > wordpress-keys.php.secret`.
+      * `curl https://api.wordpress.org/secret-key/1.1/salt/ > wordpress-keys.php.secret`.
   2. Configure your site by editing `default-app-config.nix`.
-    * For automatic install using WP-CLI:
-      * Configure the `autoInstall` section to use `enable = true;`.
-      * Copy `./wordpress-admin.keys.nix.sample` to `./wordpress-admin.keys.nix` and replace `...` with your credentials.
-    * For a traditional install where WordPress is entirely managed by the admin panel, use `freezeWordPress = false;`.
-    * To have Nix manage themes but not plugins, you can use `freezeWordPress = true; freezeThemes = true; freezePlugins = false;`.
-    * When WordPress is frozen (i.e. managed by Nix), use `wordpress.nix` to govern the installed version.
-    * When plugins are frozen (i.e. managed by Nix), use `plugins.nix` to govern which plugins are installed.
-    * When themes are frozen (i.e. managed by Nix), use `themes.nix` to govern which themes are installed.
+      * For automatic install using WP-CLI:
+          * Configure the `autoInstall` section to use `enable = true;`.
+          * Copy `./wordpress-admin.keys.nix.sample` to `./wordpress-admin.keys.nix` and replace `...` with your credentials.
+      * For a traditional install where WordPress is entirely managed by the admin panel, use `freezeWordPress = false;`.
+      * To have Nix manage themes but not plugins, you can use `freezeWordPress = true; freezeThemes = true; freezePlugins = false;`.
+      * When WordPress is frozen (i.e. managed by Nix), use `wordpress.nix` to govern the installed version.
+      * When plugins are frozen (i.e. managed by Nix), use `plugins.nix` to govern which plugins are installed.
+      * When themes are frozen (i.e. managed by Nix), use `themes.nix` to govern which themes are installed.
   3. More complex settings can be managed in `server/`.
-    * For example, change PHP-FPM configuration in `server/php-fpm-config.nix`.
+      * For example, change PHP-FPM configuration in `server/php-fpm-config.nix`.
 
 
 ## Deploying to VirtualBox
@@ -79,6 +79,7 @@ You should then be able to open the IP of the VM in your browser and test it. If
   * If you're on macOS (Darwin), be sure you have a NixOS build slave set up as described above.
   * If the state of your VirtualBox VM changes in a way that `nixops` didn't notice, your deployments may fail. Try running `deploy/manage deploy -d vbox --check` (using the `--check` flag) to tell `nixops` to reassess the state of the machine.
   * Sometimes VirtualBox will give your machine a new IP. If this happens, `nixops` (i.e. the `manage` script) may fail to connect to your machine via SSH. If this happens, remove the line with the old IP from your `~/.ssh/known_hosts` file and try again with the `--check` flag.
+  * Sometimes `nixops` will fail to deploy because a VirtualBox disk from a previous deploy is still registered. To fix this, take the given disk UUID and run `VBoxManage closemedium disk <disk UUID> --delete`.
 
 
 ## Deploying to Real Servers
