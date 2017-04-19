@@ -52,7 +52,7 @@ in {
       gzip unzip nix-repl php vim zip
     ];
 
-    time.timeZone = "${appConfig.timezone}";
+    time.timeZone = appConfig.timezone;
 
     services.nginx = {
       enable     = true;
@@ -93,7 +93,7 @@ in {
       enable        = appConfig.autoInstall.enable;
       description   = "Configure WordPress installation with WP-CLI";
       before        = [ "nginx.service" ];
-      after         = [ "mysql.service" ];
+      after         = [ "init-writeable-paths.service" "mysql.service" ];
       wantedBy      = [ "multi-user.target" ];
       serviceConfig = {
         Type        = "oneshot";
