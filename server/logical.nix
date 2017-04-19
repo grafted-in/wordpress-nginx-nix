@@ -81,31 +81,35 @@ in {
 
     systemd.services.init-writeable-paths = {
       description   = "Initialize writeable directories for the app";
-      wantedBy      = [ "multi-user.target" "phpfpm.service" "nginx.service" ];
+      before        = [ "phpfpm.service" ];
       after         = [ "network.target" ];
+      wantedBy      = [ "multi-user.target" "phpfpm.service" "nginx.service" ];
       serviceConfig = {
         Type      = "oneshot";
         ExecStart = app.initScript;
       };
     };
 
-    systemd.services.install-wp = {
-      enable        = appConfig.autoInstall.enable;
-      description   = "Configure WordPress installation with WP-CLI";
-      before        = [ "nginx.service" ];
-      after         = [ "init-writeable-paths.service" "mysql.service" ];
-      wantedBy      = [ "multi-user.target" ];
-      serviceConfig = {
-        Type        = "oneshot";
-        ExecStart   = import ./install-wp.nix {
-          inherit pkgs config appConfig writeableDataPath;
-          appPackage = app.package;
+    systemd.services.install-wp = let
+        deps = [ "init-writeable-paths.service" "mysql.service" ];
+      in {
+        enable        = appConfig.autoInstall.enable;
+        description   = "Configure WordPress installation with WP-CLI";
+        before        = [ "nginx.service" ];
+        after         = deps;
+        wants         = deps;
+        wantedBy      = [ "multi-user.target" ];
+        serviceConfig = {
+          Type        = "oneshot";
+          ExecStart   = import ./install-wp.nix {
+            inherit pkgs config appConfig writeableDataPath;
+            appPackage = app.package;
+          };
         };
+        environment.PHP_INI_SCAN_DIR = let
+            customIni = pkgs.writeTextDir "wp-cli-custom.ini" phpIni;
+          in "${pkgs.php}/etc:${customIni}";
       };
-      environment.PHP_INI_SCAN_DIR = let
-          customIni = pkgs.writeTextDir "wp-cli-custom.ini" phpIni;
-        in "${pkgs.php}/etc:${customIni}";
-    };
   }
   //
   (if !appConfig.enableHttps then {} else {
