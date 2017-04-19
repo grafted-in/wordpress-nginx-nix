@@ -29,4 +29,9 @@ pkgs.writeScript "install-wordpress.sh" ''
   '${pkgs.wp-cli}/bin/wp' option update blogdescription '${appConfig.tagline}' \
     --path='${appPackage}' \
     --allow-root;
+
+  # TODO: Provide a list of plugins to be activated from plugins.nix
+  '${pkgs.wp-cli}/bin/wp' plugin activate nginx-helper opcache \
+    --path='${appPackage}' \
+    --allow-root;
 ''
