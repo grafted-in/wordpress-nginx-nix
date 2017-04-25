@@ -12,7 +12,7 @@ in lib.makeExtensible (self: {
   description = "A Wordpress Site";    # Brief, one-line description or title
   tagline     = "Deployed with Nixops";
   host        = "www.${self.domain}";
-  adminEmail  = "admin@${self.host}";
+  adminEmail  = "admin@${self.domain}";
 
   siteUrl = "${if self.enableHttps then "https" else "http"}://${self.host}";
 
