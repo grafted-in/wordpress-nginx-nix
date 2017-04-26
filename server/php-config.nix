@@ -14,6 +14,7 @@
     zend_extension = "${pkgs.phpPackages.xdebug}/lib/php/extensions/xdebug.so"
   ''}
 
+  upload_max_filesize = ${toString appConfig.maxUploadMb}M
   date.timezone = "${appConfig.timezone}"
   sendmail_path = ${appConfig.phpSendmailPath}
 

@@ -11,6 +11,7 @@
 , appRoot             # root directory to serve
 , enableHttps         # serve the site over HTTPS only?
 , dhParams ? null     # path to the dhparams pem file to use for TLS
+, maxUploadMb         # maximum upload size in MB
 , fastCgiCachePath    # path to fast CGI cache directory or `null` to disable the cache
 , pageSpeedCachePath  # path to PageSpeed cache directory or `null` disable PageSpeed
 
@@ -162,7 +163,7 @@ let
 
     # Misc settings
     sendfile off;
-    client_max_body_size 100m;
+    client_max_body_size ${toString maxUploadMb}m;
   '';
 
   fastgciCachePart = let

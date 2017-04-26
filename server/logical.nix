@@ -34,7 +34,7 @@ in {
 
     nginxConfig = import ./nginx-config.nix {
       inherit config pkgs acmeChallengesDir phpFpmListen;
-      inherit (appConfig) enableHttps host hostRedirects;
+      inherit (appConfig) enableHttps host hostRedirects maxUploadMb;
       appRoot = "${app.package}";
       dhParams =           if appConfig.enableHttps        then "${config.security.dhparams.path}/nginx.pem" else null;
       pageSpeedCachePath = if enablePageSpeed              then "/run/nginx-pagespeed-cache" else null;

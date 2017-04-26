@@ -66,6 +66,7 @@ in lib.makeExtensible (self: {
     rendered = innerSelf.template innerSelf;
   });
 
+  maxUploadMb = 300;
 
   # Server settings
   enableHttps        = true;
