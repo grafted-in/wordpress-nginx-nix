@@ -72,6 +72,8 @@ in {
       ];
     };
 
+    systemd.services.mysql.serviceConfig.Restart = "on-failure";
+
     services.phpfpm = {
       phpOptions = phpIni;
       pools.wordpress-pool = import ./php-fpm-conf.nix { inherit config phpFpmListen; };
