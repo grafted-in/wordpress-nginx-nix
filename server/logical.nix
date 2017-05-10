@@ -116,9 +116,10 @@ in {
   //
   (if !appConfig.enableHttps then {} else {
     security.acme.certs.${appConfig.host} = {
-      webroot = acmeChallengesDir;
-      email   = appConfig.adminEmail;
-      postRun = "systemctl reload nginx.service";
+      webroot      = acmeChallengesDir;
+      email        = appConfig.adminEmail;
+      extraDomains = pkgs.lib.genAttrs appConfig.hostRedirects (x: null);
+      postRun      = "systemctl reload nginx.service";
     };
 
     # Depending on hardware, first-time deploy could take a good 5-15 minutes for this to generate.
