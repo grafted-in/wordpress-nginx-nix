@@ -97,6 +97,10 @@ We plan to add more (such as AWS) in the future. If you want to do it yourself a
 
 This repository setup assumes you want to keep some things a secret. See `SETUP-SECRETS.md` for a rundown of how that works.
 
+## Upgrading Nixpkgs
+
+All dependencies are fixed to a specific version of Nixpkgs which is configured in `deploy/nixpkgs-version.nix` which contains instructions for upgrading. The nixpkgs version also governs the version of NixOps to use during deployments. This can be overridden in `nixpkgs-version.sh`.
+
 
 ## Acknowledgements
 

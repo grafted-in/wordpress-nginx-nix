@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 
-# Check out different Nixpkgs channels here:
-#   * http://howoldis.herokuapp.com/
-#   * https://nixos.org/channels/
-#
-# To upgrade:
-#   1. Choose a channel and click on it.
-#   2. Get the URL of the `nixexprs.tar.xz` file for the channel.
-#   4. Paste the URL below for `nixpkgs_snapshot`.
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-export nixpkgs_channel="https://nixos.org/channels/nixpkgs-unstable"  # For reference only.
-export nixpkgs_snapshot="https://d3g5gsiof5omrk.cloudfront.net/nixpkgs/nixpkgs-17.03pre101896.4a524cf/nixexprs.tar.xz"
+nixpkgs_snapshot=$(eval echo "$(nix-instantiate --eval -E "(import \"$here/nixpkgs-version.nix\").url")")
+export nixpkgs_snapshot
 export nixops_version="nixops"
