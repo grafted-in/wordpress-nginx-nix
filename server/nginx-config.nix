@@ -33,7 +33,7 @@ let
 
   secureConfig = ''
     server {
-      server_name ${host};
+      server_name ${host} ${pkgs.lib.concatStringsSep " " hostRedirects};
       ${listenPart.insecure}
 
       location /.well-known/acme-challenge {
@@ -45,7 +45,16 @@ let
       }
     }
 
-    ${hostRedirectsConfig "https"}
+    ${pkgs.lib.optionalString (hostRedirects != []) ''
+      server {
+        server_name ${pkgs.lib.concatStringsSep " " hostRedirects};
+        ${listenPart.secure}
+
+        ${tlsPart}
+
+        return 301 https://${host}$request_uri;
+      }
+    ''}
 
     server {
       server_name ${host};
@@ -64,15 +73,13 @@ let
       ${serverPart}
     }
 
-    ${hostRedirectsConfig "http"}
-  '';
-
-  hostRedirectsConfig = targetScheme: pkgs.lib.optionalString (hostRedirects != []) ''
-    server {
-      server_name ${pkgs.lib.concatStringsSep " " hostRedirects};
-      ${listenPart.insecure}
-      return 301 ${targetScheme}://${host}$request_uri;
-    }
+    ${pkgs.lib.optionalString (hostRedirects != []) ''
+      server {
+        server_name ${pkgs.lib.concatStringsSep " " hostRedirects};
+        ${listenPart.insecure}
+        return 301 http://${host}$request_uri;
+      }
+    ''}
   '';
 
   # Listen for both IPv4 & IPv6 requests with http2 enabled
