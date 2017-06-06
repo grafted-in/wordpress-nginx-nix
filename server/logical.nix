@@ -76,7 +76,10 @@ in {
 
     services.phpfpm = {
       phpOptions = phpIni;
-      pools.wordpress-pool = import ./php-fpm-conf.nix { inherit config phpFpmListen; };
+      pools.wordpress-pool = import ./php-fpm-conf.nix {
+        inherit pkgs config phpFpmListen;
+        processSettings = appConfig.phpFpmProcessSettings;
+      };
     };
 
     services.postfix.enable = true;

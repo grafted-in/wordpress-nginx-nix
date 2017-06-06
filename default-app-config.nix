@@ -73,9 +73,29 @@ in lib.makeExtensible (self: {
   enableFastCgiCache = true;
   enableRollback     = true;
 
-  # PHP settings
-  enableOpCache      = true;
-  enableXDebug       = false;
+
+  # --- ADVANCED CONFIGURATION ---
+
+  enableXDebug = false;
+
+  opcache = lib.makeExtensible (innerSelf: {
+    enable            = true;
+    maxMemoryMb       = 128;
+
+    # How often to invalidate timestamp cache. This is only used when the project
+    # has non-frozen components (see above).
+    # http://php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
+    revalidateFreqSec = 60;
+  });
+
+  # PHP-FPM settings for the *dynamic* process manager: http://php.net/manual/en/install.fpm.configuration.php#pm
+  phpFpmProcessSettings = lib.makeExtensible (innerSelf: {
+    max_children      = 10;
+    start_servers     = innerSelf.min_spare_servers;  # WARNING: min_spare_servers <= start_servers <= max_spare_servers
+    min_spare_servers = 2;
+    max_spare_servers = 5;
+    max_requests      = 500;
+  });
 
   # sendmail_path configuration for php.ini files
   phpSendmailPath = "/run/wrappers/bin/sendmail -t -i";
