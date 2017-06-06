@@ -3,10 +3,10 @@
 #   * http://us3.php.net/manual/en/opcache.installation.php
 #   * https://tideways.io/profiler/blog/fine-tune-your-opcache-configuration-to-avoid-caching-suprises
 
-{ enabled }:
+{ enable, maxMemoryMb, validateTimestamps, revalidateFreqSec, ... }:
 ''
-  opcache.enable=${if enabled then "1" else "0"}
-  opcache.memory_consumption=128  ; MB
+  opcache.enable=${if enable then "1" else "0"}
+  opcache.memory_consumption=${toString maxMemoryMb}  ; MB
   opcache.interned_strings_buffer=8  ; The amount of memory to store immutable strings
   opcache.save_comments=1 ; Comments in code will be compiled
   opcache.load_comments=0 ; Comments will not be loaded
@@ -23,12 +23,12 @@
   ; See http://php.net/manual/en/opcache.configuration.php#ini.opcache.enable-file-override
   opcache.enable_file_override=1
 
-  ; Turn off cache experation.
+  ; Cache expiration.
   ; See http://php.net/manual/en/opcache.configuration.php#ini.opcache.validate-timestamps
-  opcache.validate_timestamps=0
+  opcache.validate_timestamps=${if validateTimestamps then "1" else "0"}
 
   ; How long to check a file if it needs to be re-cached
   ; If opcache.validate_timestamps is disabled, this is ignored.
   ; See http://php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
-  ; opcache.revalidate_freq=60
+  opcache.revalidate_freq=${toString revalidateFreqSec}
 ''

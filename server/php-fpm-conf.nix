@@ -1,4 +1,7 @@
-{ config, phpFpmListen }:
+{ pkgs, config, phpFpmListen, processSettings }:
+let
+  setToString = (import ./utils.nix).setToString pkgs;
+in
 {
   listen = phpFpmListen;
   extraConfig = ''
@@ -10,11 +13,7 @@
     listen.mode = 660
 
     pm = dynamic
-    pm.max_children      = 10
-    pm.start_servers     = 5
-    pm.min_spare_servers = 2
-    pm.max_spare_servers = 5
-    pm.max_requests      = 500
+    ${setToString "\n" (setting: value: "pm.${setting} = ${toString value}") processSettings}
 
     ; Redirect worker stdout and stderr into main error log. If not set, stdout and
     ; stderr will be redirected to /dev/null according to FastCGI specs.
