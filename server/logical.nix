@@ -49,7 +49,7 @@ in {
     };
 
     environment.systemPackages = with pkgs; [
-      gzip unzip nix-repl php vim zip
+      gzip unzip nix-repl php vim wp-cli zip
     ];
 
     time.timeZone = appConfig.timezone;
