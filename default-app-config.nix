@@ -78,6 +78,8 @@ in lib.makeExtensible (self: {
 
   enableXDebug = false;
 
+  extraTools = pkgs: [];  # Add tools to the server, e.g. [pkgs.git]
+
   phpScriptMemoryLimitMb = 128;
 
   opcache = lib.makeExtensible (innerSelf: {
