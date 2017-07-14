@@ -3,6 +3,8 @@
 , appConfig
 }:
 ''
+  memory_limit ${toString appConfig.phpScriptMemoryLimitMb}M
+
   extension = "${pkgs.phpPackages.imagick}/lib/php/extensions/imagick.so"
 
   ${pkgs.lib.optionalString appConfig.opcache.enable ''

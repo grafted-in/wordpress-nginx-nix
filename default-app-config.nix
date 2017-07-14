@@ -78,6 +78,8 @@ in lib.makeExtensible (self: {
 
   enableXDebug = false;
 
+  phpScriptMemoryLimitMb = 128;
+
   opcache = lib.makeExtensible (innerSelf: {
     enable            = true;
     maxMemoryMb       = 128;
