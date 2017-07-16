@@ -21,7 +21,7 @@ in {
 
     acmeChallengesDir = "/var/www/challenges";
     phpFpmListen      = "/run/phpfpm/wordpress-pool.sock";
-    enablePageSpeed   = pkgs.stdenv.isLinux;
+    enablePageSpeed   = pkgs.stdenv.isLinux && appConfig.googlePageSpeed.enable;
 
     writeableDataPath = "/var/lib/phpfpm/${appConfig.name}";
     app = pkgs.callPackage ./app.nix {
@@ -36,9 +36,18 @@ in {
       inherit config pkgs acmeChallengesDir phpFpmListen;
       inherit (appConfig) enableHttps host hostRedirects maxUploadMb;
       appRoot = "${app.package}";
-      dhParams =           if appConfig.enableHttps        then "${config.security.dhparams.path}/nginx.pem" else null;
-      pageSpeedCachePath = if enablePageSpeed              then "/run/nginx-pagespeed-cache" else null;
-      fastCgiCachePath   = if appConfig.enableFastCgiCache then "/run/nginx-fastcgi-cache"   else null;
+      dhParams           =
+        if appConfig.enableHttps
+          then "${config.security.dhparams.path}/nginx.pem"
+          else null;
+      pageSpeedCachePath =
+        if appConfig.googlePageSpeed.enable
+          then appConfig.googlePageSpeed.cachePath
+          else null;
+      fastCgiCachePath   =
+        if appConfig.fastCgiCache.enable
+          then appConfig.fastCgiCache.cachePath
+          else null;
     };
 
     phpIni = import ./php-config.nix { inherit pkgs config appConfig; };

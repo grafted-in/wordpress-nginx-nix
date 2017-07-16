@@ -66,21 +66,14 @@ in lib.makeExtensible (self: {
     rendered = innerSelf.template innerSelf;
   });
 
-  maxUploadMb = 300;
 
   # Server settings
-  enableHttps        = true;
-  enableFastCgiCache = true;
-  enableRollback     = true;
-
+  enableHttps    = true;
+  enableRollback = true;
+  maxUploadMb    = 50;
 
   # --- ADVANCED CONFIGURATION ---
-
-  enableXDebug = false;
-
   extraTools = pkgs: [];  # Add tools to the server, e.g. [pkgs.git]
-
-  phpScriptMemoryLimitMb = 128;
 
   opcache = lib.makeExtensible (innerSelf: {
     enable            = true;
@@ -101,6 +94,23 @@ in lib.makeExtensible (self: {
     max_requests      = 500;
   });
 
-  # sendmail_path configuration for php.ini files
-  phpSendmailPath = "/run/wrappers/bin/sendmail -t -i";
+  googlePageSpeed = lib.makeExtensible (innerSelf: {
+    enable    = true;
+    cachePath = "/run/nginx-pagespeed-cache";  # /run/ is tmpfs and will keep cache in memory
+  });
+
+  fastCgiCache = lib.makeExtensible (innerSelf: {
+    enable    = true;
+    cachePath = "/run/nginx-fastcgi-cache"; # /run/ is tmpfs and will keep cache in memory
+  });
+
+  php = lib.makeExtensible (innerSelf: {
+    enableXDebug = false;
+
+    scriptMemoryLimitMb = 128;
+    maxExecutionTimeSec = 300;
+
+    # sendmail_path configuration for php.ini files
+    sendmailPath = "/run/wrappers/bin/sendmail -t -i";
+  });
 })
