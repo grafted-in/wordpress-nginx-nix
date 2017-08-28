@@ -138,7 +138,7 @@ let
 
     # Root directory location handler
     location / {
-      try_files $uri $uri/ /index.php?$query_string;
+      try_files $uri/index.html $uri $uri/ /index.php?$query_string;
     }
 
     ${if enableFastCgiCache then fastgciCachePart.serverConfig else ""}
