@@ -17,6 +17,8 @@
 
 , acmeChallengesDir   # directory where ACME (Let's Encrypt) challenges are stored
 , phpFpmListen        # listen setting for PHP-FPM
+
+, extraLocations      # extra location directives to place above WordPress
 }:
 let
 
@@ -135,6 +137,9 @@ let
 
     # Load configuration files from nginx-partials
     include ${./nginx-partials}/*.conf;
+
+    # Extra locations (if any)
+    ${pkgs.lib.concatStringsSep "\n" extraLocations}
 
     # Root directory location handler
     location / {

@@ -48,10 +48,13 @@ in {
         if appConfig.fastCgiCache.enable
           then appConfig.fastCgiCache.cachePath
           else null;
+      extraLocations = appConfig.extraNginxLocations;
     };
 
     phpIni = import ./php-config.nix { inherit pkgs config appConfig; };
   in {
+    imports = appConfig.imports;
+
     networking = {
       hostName = machineName;
       firewall.allowedTCPPorts = [80] ++ pkgs.lib.optional appConfig.enableHttps 443;

@@ -75,6 +75,11 @@ in lib.makeExtensible (self: {
   # --- ADVANCED CONFIGURATION ---
   extraTools = pkgs: [];  # Add tools to the server, e.g. [pkgs.git]
 
+  imports = [];  # module imports for the server
+
+  # raw nginx location directives to insert above the WordPress locations
+  extraNginxLocations = pkgs: [];
+
   opcache = lib.makeExtensible (innerSelf: {
     enable            = true;
     maxMemoryMb       = 128;
