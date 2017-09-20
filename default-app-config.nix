@@ -78,7 +78,7 @@ in lib.makeExtensible (self: {
   imports = [];  # module imports for the server
 
   # raw nginx location directives to insert above the WordPress locations
-  extraNginxLocations = pkgs: [];
+  extraNginxLocations = [];
 
   opcache = lib.makeExtensible (innerSelf: {
     enable            = true;
