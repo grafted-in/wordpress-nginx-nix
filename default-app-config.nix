@@ -73,8 +73,6 @@ in lib.makeExtensible (self: {
   maxUploadMb    = 50;
 
   # --- ADVANCED CONFIGURATION ---
-  extraTools = pkgs: [];  # Add tools to the server, e.g. [pkgs.git]
-
   imports = [];  # module imports for the server
 
   # raw nginx location directives to insert above the WordPress locations

@@ -52,8 +52,24 @@ in {
     };
 
     phpIni = import ./php-config.nix { inherit pkgs config appConfig; };
+
+    httpsModule = {
+      security.acme.certs.${appConfig.host} = {
+        webroot      = acmeChallengesDir;
+        email        = appConfig.adminEmail;
+        extraDomains = pkgs.lib.genAttrs appConfig.hostRedirects (x: null);
+        postRun      = "systemctl reload nginx.service";
+      };
+
+      # Depending on hardware, first-time deploy could take a good 5-15 minutes for this to generate.
+      security.dhparams.params = { nginx = 3072; };
+    };
+
   in {
-    imports = appConfig.imports;
+
+    imports = [
+      (if appConfig.enableHttps then httpsModule else {})
+    ] ++ appConfig.imports;
 
     networking = {
       hostName = machineName;
@@ -62,7 +78,7 @@ in {
 
     environment.systemPackages = with pkgs; [
       gzip htop unzip nix-repl php vim wp-cli zip
-    ] ++ appConfig.extraTools pkgs;
+    ];
 
     time.timeZone = appConfig.timezone;
 
@@ -127,17 +143,5 @@ in {
             customIni = pkgs.writeTextDir "wp-cli-custom.ini" phpIni;
           in "${pkgs.php}/etc:${customIni}";
       };
-  }
-  //
-  (if !appConfig.enableHttps then {} else {
-    security.acme.certs.${appConfig.host} = {
-      webroot      = acmeChallengesDir;
-      email        = appConfig.adminEmail;
-      extraDomains = pkgs.lib.genAttrs appConfig.hostRedirects (x: null);
-      postRun      = "systemctl reload nginx.service";
-    };
-
-    # Depending on hardware, first-time deploy could take a good 5-15 minutes for this to generate.
-    security.dhparams.params = { nginx = 3072; };
-  });
+  };
 }
