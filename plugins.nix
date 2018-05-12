@@ -6,7 +6,7 @@ let
 
   requiredPlugins = [
     (getPlugin "opcache"      "0.3.1" "18x6fnfc7ka4ynxv4z3rf4011ivqc0qy0dsd6i4lxa113jjyqz6d")
-    (getPlugin "nginx-helper" "1.9.10" "0zwhviapx3mir5qyzbbmy329vkw3km2k9gf758328rsfs8g9sd1s")
+    (getPlugin "nginx-helper" "1.9.10" "1n887qz9rzs8yj069wva6cirp6y46a49wspzja4grdj2qirr4hky")
   ];
 in requiredPlugins ++ [
   (getPlugin "akismet" "3.3"   "02vsjnr7bs54a744p64rx7jwlbcall6nhh1mv6w54zbwj4ygqz68")
